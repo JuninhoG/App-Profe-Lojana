@@ -42,11 +42,26 @@ export default function App() {
   }, []);
 
   const toggleDayCompletion = (day: number) => {
+    const isMarkingComplete = !completedDays.includes(day);
+    
     setCompletedDays(prev => {
       const next = prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day];
       localStorage.setItem('glutefit_progress', JSON.stringify(next));
       return next;
     });
+
+    // Auto-advance logic: If we just completed the current day, move to the next one
+    if (isMarkingComplete && day === selectedDay.day) {
+      const currentIndex = CHALLENGE_DATA.findIndex(d => d.day === day);
+      if (currentIndex < CHALLENGE_DATA.length - 1) {
+        setTimeout(() => {
+          setSelectedDay(CHALLENGE_DATA[currentIndex + 1]);
+          // Scroll to top of main content
+          const mainContent = document.querySelector('main');
+          if (mainContent) mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 800); // Small delay for visual feedback
+      }
+    }
   };
 
   // Helper to convert Drive view link to embed link
@@ -141,8 +156,8 @@ export default function App() {
                 <Dumbbell size={16} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold truncate">Profe Lojana Sarquis</p>
-                <p className="text-[10px] opacity-60">Tu Coach de Glúteos</p>
+                <p className="text-xs font-bold truncate">Coach Lojana Sarquis</p>
+                <p className="text-[10px] opacity-60">Tu Guía de Entrenamiento</p>
               </div>
             </div>
           </div>
@@ -166,7 +181,7 @@ export default function App() {
             </div>
             <h2 className="font-bold text-base sm:text-lg truncate leading-tight">{selectedDay.title}</h2>
           </div>
-          <div className="ml-2 shrink-0">
+          <div className="ml-2 shrink-0 flex items-center gap-2">
             <button 
               onClick={() => toggleDayCompletion(selectedDay.day)}
               className={cn(
@@ -182,6 +197,18 @@ export default function App() {
                 <><span className="hidden xs:inline">Marcar Completado</span><span className="xs:hidden">Completar</span></>
               )}
             </button>
+            {selectedDay.day < 30 && (
+              <button 
+                onClick={() => {
+                  const nextDay = CHALLENGE_DATA.find(d => d.day === selectedDay.day + 1);
+                  if (nextDay) setSelectedDay(nextDay);
+                }}
+                className="p-2 sm:p-2.5 bg-white border border-[#E6E1D6] text-[#3A5A40] rounded-full hover:bg-[#F3F1ED] transition-all shadow-sm active:scale-95"
+                title="Siguiente Clase"
+              >
+                <ChevronRight size={20} />
+              </button>
+            )}
           </div>
         </header>
 
@@ -270,7 +297,7 @@ export default function App() {
               </section>
 
               {/* Mobile Final Action Button */}
-              <div className="lg:hidden pt-4 pb-8">
+              <div className="lg:hidden pt-4 pb-8 flex flex-col gap-3">
                 <button 
                   onClick={() => toggleDayCompletion(selectedDay.day)}
                   className={cn(
@@ -286,6 +313,17 @@ export default function App() {
                     "Finalizar Clase de Hoy"
                   )}
                 </button>
+                {selectedDay.day < 30 && (
+                  <button 
+                    onClick={() => {
+                      const nextDay = CHALLENGE_DATA.find(d => d.day === selectedDay.day + 1);
+                      if (nextDay) setSelectedDay(nextDay);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl text-base font-bold bg-white border border-[#E6E1D6] text-[#3A5A40] shadow-sm active:scale-[0.98]"
+                  >
+                    Siguiente Clase <ChevronRight size={20} />
+                  </button>
+                )}
               </div>
             </div>
 
