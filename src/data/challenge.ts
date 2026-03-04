@@ -45,12 +45,12 @@ export const CHALLENGE_DATA: DayRoutine[] = [
       {
         name: "Abducción de cadera lateral",
         reps: "3 series de 20 reps",
-        videoUrl: "https://drive.google.com/file/d/1gOtJ8V5VYB57pH8ALFozQb56ybfY7p86/view?usp=sharing"
+        videoUrl: "https://drive.google.com/file/d/1EusXeC5NF1rhlFC9IH0nTESu5CffGbId/view?usp=sharing"
       },
       {
         name: "Fire Hydrants (Bocas de incendio)",
         reps: "3 series de 15 reps",
-        videoUrl: "https://drive.google.com/file/d/1gOtJ8V5VYB57pH8ALFozQb56ybfY7p86/view?usp=sharing"
+        videoUrl: "https://drive.google.com/file/d/1EusXeC5NF1rhlFC9IH0nTESu5CffGbId/view?usp=sharing"
       }
     ],
     tip: "Mantén la cadera estable, no permitas que el torso gire."
