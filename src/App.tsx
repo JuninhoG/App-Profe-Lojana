@@ -18,7 +18,9 @@ import {
   Menu,
   X,
   ArrowLeft,
-  ExternalLink
+  ExternalLink,
+  Lock,
+  User
 } from 'lucide-react';
 import { CHALLENGE_DATA, DayRoutine, Exercise } from './data/challenge';
 import { clsx, type ClassValue } from 'clsx';
@@ -33,13 +35,32 @@ export default function App() {
   const [selectedDay, setSelectedDay] = useState<DayRoutine>(CHALLENGE_DATA[0]);
   const [completedDays, setCompletedDays] = useState<number[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginError, setLoginError] = useState('');
 
   useEffect(() => {
-    const saved = localStorage.getItem('glutefit_progress');
-    if (saved) {
-      setCompletedDays(JSON.parse(saved));
+    const savedProgress = localStorage.getItem('glutefit_progress');
+    if (savedProgress) {
+      setCompletedDays(JSON.parse(savedProgress));
+    }
+
+    const auth = localStorage.getItem('glutefit_auth');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
     }
   }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loginForm.username === 'desafio30d' && loginForm.password === 'Sarquis102030!') {
+      setIsAuthenticated(true);
+      localStorage.setItem('glutefit_auth', 'true');
+      setLoginError('');
+    } else {
+      setLoginError('Usuario o contraseña incorrectos');
+    }
+  };
 
   const toggleDayCompletion = (day: number) => {
     const isMarkingComplete = !completedDays.includes(day);
@@ -75,6 +96,81 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#FDFBF7] text-[#344E41] font-sans overflow-hidden">
+      <AnimatePresence>
+        {!isAuthenticated && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-[#FDFBF7] flex items-center justify-center p-4"
+          >
+            <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-[#E6E1D6] p-8 sm:p-10">
+              <div className="flex flex-col items-center text-center mb-8">
+                <div className="w-16 h-16 bg-[#A3B18A] rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg">
+                  <Lock size={32} />
+                </div>
+                <h1 className="text-2xl font-bold tracking-tight mb-2">Acceso Exclusivo</h1>
+                <p className="text-sm opacity-60">Ingresa tus credenciales para acceder al desafío de la Coach Lojana Sarquis.</p>
+              </div>
+
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest opacity-60 ml-1">Usuario</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A3B18A]" size={18} />
+                    <input 
+                      type="text"
+                      value={loginForm.username}
+                      onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
+                      placeholder="Nombre de usuario"
+                      className="w-full pl-12 pr-4 py-3.5 bg-[#F3F1ED] border-2 border-transparent focus:border-[#A3B18A] rounded-2xl outline-none transition-all text-sm font-medium"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest opacity-60 ml-1">Contraseña</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A3B18A]" size={18} />
+                    <input 
+                      type="password"
+                      value={loginForm.password}
+                      onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                      placeholder="••••••••"
+                      className="w-full pl-12 pr-4 py-3.5 bg-[#F3F1ED] border-2 border-transparent focus:border-[#A3B18A] rounded-2xl outline-none transition-all text-sm font-medium"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {loginError && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs font-bold text-center"
+                  >
+                    {loginError}
+                  </motion.p>
+                )}
+
+                <button 
+                  type="submit"
+                  className="w-full bg-[#3A5A40] text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-[#344E41] active:scale-[0.98] transition-all mt-4"
+                >
+                  Entrar al Desafío
+                </button>
+              </form>
+
+              <div className="mt-8 pt-6 border-t border-[#E6E1D6] text-center">
+                <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">Desafío de Glúteos 30 Días</p>
+                <p className="text-[10px] font-bold text-[#A3B18A]">Coach Lojana Sarquis</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Sidebar - Desktop */}
       <aside className={cn(
         "fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-[#E6E1D6] transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
